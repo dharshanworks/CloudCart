@@ -16,7 +16,7 @@ frontend:
     repository: iamdharshanrt/cloudcart-frontend
     tag: v1
 
-  replicas: 2
+  replicas: 3
   port: 80
 
   service:

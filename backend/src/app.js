@@ -14,6 +14,7 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import client from 'prom-client';
 
 /**
  * Express Application Factory
@@ -27,6 +28,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+/**
+ * PROMETHEUS METRICS
+ */
+client.collectDefaultMetrics();
 
 /**
  * SECTION 1: TRUST PROXY
@@ -118,6 +124,14 @@ app.get('/api/health', (req, res) => {
     uptime: process.uptime(),
     environment: envConfig.NODE_ENV,
   });
+});
+
+/**
+ * PROMETHEUS METRICS ENDPOINT
+ */
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
 });
 
 /**

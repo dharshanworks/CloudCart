@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: cloudcart-backend:latest
+          image: iamdharshanrt/cloudcart-backend:v1 
 
           ports:
             - containerPort: 5000
