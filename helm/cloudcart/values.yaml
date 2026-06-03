@@ -1,7 +1,7 @@
 backend:
   image:
     repository: iamdharshanrt/cloudcart-backend
-    tag: v3
+    tag: v8
 
   replicas: 2
 
