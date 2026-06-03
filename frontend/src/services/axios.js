@@ -26,9 +26,7 @@ const normalizeApiUrl = (value) => {
 };
 
 const configuredApiUrl = normalizeApiUrl(import.meta.env.VITE_API_URL);
-const defaultApiUrl = import.meta.env.DEV
-  ? '/api'
-  : `${window.location.protocol}//${window.location.hostname}:5000/api`;
+const defaultApiUrl = '/api';
 const BASE_URL = configuredApiUrl || defaultApiUrl;
 
 const api = axios.create({

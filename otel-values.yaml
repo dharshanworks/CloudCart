@@ -1,0 +1,20 @@
+mode: deployment
+
+image:
+  repository: otel/opentelemetry-collector-k8s
+
+config:
+  exporters:
+    debug: {}
+
+    otlp:
+      endpoint: jaeger.tracing.svc.cluster.local:4317
+      tls:
+        insecure: true
+
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [debug, otlp]

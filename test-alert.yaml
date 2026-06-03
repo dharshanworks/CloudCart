@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cloudcart-test-alert
+  namespace: monitoring
+spec:
+  groups:
+  - name: cloudcart-test
+    rules:
+    - alert: CloudCartTestAlert
+      expr: vector(1)
+      for: 30s
+      labels:
+        severity: warning
+      annotations:
+        summary: "CloudCart Test Alert"
+        description: "This is a test alert generated for Alertmanager."

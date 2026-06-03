@@ -1,0 +1,16 @@
+alertmanager:
+  config:
+    global:
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'iamdharshanrt@gmail.com'
+      smtp_auth_username: 'iamdharshanrt@gmail.com'
+      smtp_auth_password: 'khmg sqcf rshx tpgl'
+
+    route:
+      receiver: email-alert
+
+    receivers:
+    - name: email-alert
+      email_configs:
+      - to: 'iamdharshanrt@gmail.com'
+        send_resolved: true
