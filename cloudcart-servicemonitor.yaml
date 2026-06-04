@@ -1,6 +1,5 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
-
 metadata:
   name: cloudcart-backend
   namespace: monitoring
@@ -8,15 +7,15 @@ metadata:
     release: monitoring
 
 spec:
-  selector:
-    matchLabels:
-      app: cloudcart-backend
-
   namespaceSelector:
     matchNames:
       - cloudcart
 
+  selector:
+    matchLabels:
+      app: cloudcart-backend
+
   endpoints:
-    - targetPort: 5000
-      path: /metrics
-      interval: 30s
+  - port: metrics
+    path: /metrics
+    interval: 15s
