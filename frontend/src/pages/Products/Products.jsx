@@ -29,23 +29,23 @@ export const Products = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Search and filter state
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [advancedFilters, setAdvancedFilters] = useState({});
-  
+
   // Pagination state
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [limit] = useState(12); // Products per page
-  
+
   // UI state
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [sortBy, setSortBy] = useState('relevance');
   const [filtersOpen, setFiltersOpen] = useState(false);
-  
+
   // Modal state
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [compareProducts, setCompareProducts] = useState([]);
@@ -85,18 +85,9 @@ export const Products = () => {
       let response;
 
       if (search && selectedCategory) {
-        response = await productService.searchAndFilter(
-          search,
-          selectedCategory,
-          page,
-          limit
-        );
+        response = await productService.searchAndFilter(search, selectedCategory, page, limit);
       } else if (selectedCategory) {
-        response = await productService.filterByCategory(
-          selectedCategory,
-          page,
-          limit
-        );
+        response = await productService.filterByCategory(selectedCategory, page, limit);
       } else if (search) {
         response = await productService.search(search, page, limit);
       } else {
@@ -131,26 +122,20 @@ export const Products = () => {
   // Apply advanced filters
   const applyAdvancedFilters = (productList) => {
     return productList.filter((product) => {
-      // Price filter
       if (advancedFilters.priceRange) {
         const [minPrice, maxPrice] = advancedFilters.priceRange;
         if (product.price < minPrice || product.price > maxPrice) {
           return false;
         }
       }
-
-      // Rating filter
       if (advancedFilters.minRating && advancedFilters.minRating > 0) {
         if (!product.rating || product.rating < advancedFilters.minRating) {
           return false;
         }
       }
-
-      // Stock filter
       if (advancedFilters.inStockOnly && product.stock === 0) {
         return false;
       }
-
       return true;
     });
   };
@@ -158,7 +143,6 @@ export const Products = () => {
   // Sort products
   const sortProducts = (productList) => {
     const sorted = [...productList];
-
     switch (sortBy) {
       case 'price-low':
         sorted.sort((a, b) => a.price - b.price);
@@ -170,19 +154,14 @@ export const Products = () => {
         sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       case 'newest':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-        );
+        sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
         break;
       case 'popularity':
         sorted.sort((a, b) => (b.reviews?.length || 0) - (a.reviews?.length || 0));
         break;
       default:
-        // Relevance - no change
         break;
     }
-
     return sorted;
   };
 
@@ -241,29 +220,38 @@ export const Products = () => {
 
   // Check if any filters are active
   const hasActiveFilters =
-    search ||
-    selectedCategory ||
-    Object.keys(advancedFilters).length > 0;
+    search || selectedCategory || Object.keys(advancedFilters).length > 0;
 
   return (
     <div className="min-h-screen bg-transparent">
+      {/* Scoped keyframes for staggered grid load + subtle header reveal */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .v0-fade-up { animation: fadeUp 0.5s ease-out both; }
+      `}</style>
+
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-6">
         <Breadcrumb />
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-2">Shop Products</h1>
+        {/* Header — gradient clipped-text title to match brand pages */}
+        <div className="v0-fade-up mb-8">
+          <h1 className="mb-2 bg-linear-to-r from-base-content via-base-content/80 to-base-content bg-clip-text text-4xl font-extrabold tracking-tight text-transparent md:text-5xl">
+            Shop Products
+          </h1>
           <p className="text-base-content/70">
             Browse our collection of {total} products
           </p>
         </div>
 
-        {/* Search and Filter Section */}
-        <div className="bg-base-100 p-6 rounded-lg shadow-md mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* Search and Filter Section — elevated card with hover lift */}
+        <div className="v0-fade-up mb-8 rounded-2xl border border-base-300 bg-base-100 p-6 shadow-md transition-shadow duration-300 hover:shadow-lg">
+          <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Search Input */}
             <div className="form-control">
               <label className="label">
@@ -272,7 +260,7 @@ export const Products = () => {
               <input
                 type="text"
                 placeholder="Search by name, brand, or category..."
-                className="input input-bordered w-full"
+                className="input input-bordered w-full transition-all duration-200 focus:scale-[1.01] focus:input-primary"
                 value={search}
                 onChange={handleSearchChange}
               />
@@ -289,7 +277,7 @@ export const Products = () => {
                 <span className="label-text font-semibold">Category</span>
               </label>
               <select
-                className="select select-bordered w-full"
+                className="select select-bordered w-full transition-all duration-200 focus:select-primary"
                 value={selectedCategory}
                 onChange={handleCategoryChange}
               >
@@ -305,39 +293,30 @@ export const Products = () => {
 
           {/* Active Filters Display and Clear Button */}
           {hasActiveFilters && (
-            <div className="flex items-center justify-between pt-4 border-t flex-wrap gap-2">
-              <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-base-300 pt-4">
+              <div className="flex flex-wrap gap-2">
                 {search && (
-                  <div className="badge badge-lg gap-2 badge-accent">
+                  <div className="badge badge-lg badge-accent gap-2 transition-transform duration-200 hover:scale-105">
                     Search: {search}
-                    <button
-                      onClick={() => setSearch('')}
-                      className="cursor-pointer"
-                    >
+                    <button onClick={() => setSearch('')} className="cursor-pointer">
                       ✕
                     </button>
                   </div>
                 )}
                 {selectedCategory && (
-                  <div className="badge badge-lg gap-2 badge-info">
+                  <div className="badge badge-lg badge-info gap-2 transition-transform duration-200 hover:scale-105">
                     Category: {selectedCategory}
-                    <button
-                      onClick={() => setSelectedCategory('')}
-                      className="cursor-pointer"
-                    >
+                    <button onClick={() => setSelectedCategory('')} className="cursor-pointer">
                       ✕
                     </button>
                   </div>
                 )}
                 {advancedFilters.priceRange && (
-                  <div className="badge badge-lg gap-2 badge-warning">
+                  <div className="badge badge-lg badge-warning gap-2 transition-transform duration-200 hover:scale-105">
                     Price: ${advancedFilters.priceRange[0]} - ${advancedFilters.priceRange[1]}
                     <button
                       onClick={() =>
-                        setAdvancedFilters({
-                          ...advancedFilters,
-                          priceRange: undefined
-                        })
+                        setAdvancedFilters({ ...advancedFilters, priceRange: undefined })
                       }
                       className="cursor-pointer"
                     >
@@ -348,7 +327,7 @@ export const Products = () => {
               </div>
               <button
                 onClick={handleClearFilters}
-                className="btn btn-sm btn-outline"
+                className="btn btn-sm btn-outline transition-all duration-200 hover:scale-105"
               >
                 Clear All Filters
               </button>
@@ -359,8 +338,7 @@ export const Products = () => {
         {/* Results Info */}
         {!loading && products.length > 0 && (
           <div className="mb-4 text-sm text-base-content/70">
-            Showing {(page - 1) * limit + 1} to{' '}
-            {Math.min(page * limit, total)} of {total} products
+            Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)} of {total} products
           </div>
         )}
 
@@ -374,13 +352,13 @@ export const Products = () => {
           />
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
           {/* Sidebar Filters */}
           <div className="lg:col-span-1">
             {/* Mobile Filter Button */}
             <button
               onClick={() => setFiltersOpen(!filtersOpen)}
-              className="btn btn-outline w-full mb-4 lg:hidden"
+              className="btn btn-outline mb-4 w-full transition-all duration-200 hover:scale-[1.02] lg:hidden"
             >
               🎚️ Filters {compareProducts.length > 0 && `(${compareProducts.length})`}
             </button>
@@ -396,23 +374,16 @@ export const Products = () => {
 
               {/* Comparison Panel */}
               {compareProducts.length > 0 && (
-                <div className="mt-6 rounded-lg border border-info/30 bg-info/10 p-4">
-                  <p className="font-semibold mb-3">
-                    Comparing ({compareProducts.length}/4)
-                  </p>
-                  <div className="space-y-2 mb-3">
+                <div className="v0-fade-up mt-6 rounded-2xl border border-info/30 bg-info/10 p-4 shadow-sm">
+                  <p className="mb-3 font-semibold">Comparing ({compareProducts.length}/4)</p>
+                  <div className="mb-3 space-y-2">
                     {compareProducts.map((product) => (
                       <div
                         key={product._id}
-                        className="flex items-center justify-between rounded bg-base-100 p-2"
+                        className="flex items-center justify-between rounded-lg bg-base-100 p-2 transition-shadow duration-200 hover:shadow-md"
                       >
-                        <p className="text-sm font-medium line-clamp-1">
-                          {product.name}
-                        </p>
-                        <button
-                          onClick={() => handleCompare(product)}
-                          className="btn btn-xs btn-ghost"
-                        >
+                        <p className="line-clamp-1 text-sm font-medium">{product.name}</p>
+                        <button onClick={() => handleCompare(product)} className="btn btn-xs btn-ghost">
                           ✕
                         </button>
                       </div>
@@ -420,7 +391,7 @@ export const Products = () => {
                   </div>
                   <button
                     onClick={() => setShowComparison(true)}
-                    className="btn btn-primary btn-sm w-full"
+                    className="btn btn-primary btn-sm w-full transition-all duration-200 hover:scale-[1.02]"
                   >
                     Compare ({compareProducts.length})
                   </button>
@@ -446,11 +417,11 @@ export const Products = () => {
           <div className="lg:col-span-3">
             {/* Error State */}
             {error && (
-              <div className="alert alert-error shadow-lg mb-6">
+              <div className="alert alert-error mb-6 shadow-lg">
                 <div>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="stroke-current `shrink-0` h-6 w-6"
+                    className="h-6 w-6 shrink-0 stroke-current"
                     fill="none"
                     viewBox="0 0 24 24"
                   >
@@ -464,10 +435,7 @@ export const Products = () => {
                   <span>{error}</span>
                 </div>
                 <div>
-                  <button
-                    onClick={() => fetchProducts()}
-                    className="btn btn-sm btn-outline"
-                  >
+                  <button onClick={() => fetchProducts()} className="btn btn-sm btn-outline">
                     Retry
                   </button>
                 </div>
@@ -481,29 +449,39 @@ export const Products = () => {
               </div>
             )}
 
-            {/* Products Grid */}
+            {/* Products Grid — each item staggers in on load */}
             {!loading && products.length > 0 && (
               <>
                 {viewMode === 'grid' ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    {products.map((product) => (
-                      <ProductCard
+                  <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {products.map((product, i) => (
+                      <div
                         key={product._id}
-                        product={product}
-                        onQuickView={handleQuickView}
-                        onCompare={handleCompare}
-                      />
+                        className="v0-fade-up"
+                        style={{ animationDelay: `${Math.min(i * 60, 480)}ms` }}
+                      >
+                        <ProductCard
+                          product={product}
+                          onQuickView={handleQuickView}
+                          onCompare={handleCompare}
+                        />
+                      </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-4 mb-8">
-                    {products.map((product) => (
-                      <ProductListCard
+                  <div className="mb-8 space-y-4">
+                    {products.map((product, i) => (
+                      <div
                         key={product._id}
-                        product={product}
-                        onQuickView={handleQuickView}
-                        onCompare={handleCompare}
-                      />
+                        className="v0-fade-up"
+                        style={{ animationDelay: `${Math.min(i * 60, 480)}ms` }}
+                      >
+                        <ProductListCard
+                          product={product}
+                          onQuickView={handleQuickView}
+                          onCompare={handleCompare}
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
@@ -513,7 +491,7 @@ export const Products = () => {
             {/* Empty State */}
             {!loading && products.length === 0 && !error && (
               <div className="col-span-full">
-                <div className="flex flex-col items-center justify-center py-16">
+                <div className="v0-fade-up flex flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100/50 py-16">
                   <div className="text-center">
                     <svg
                       className="mx-auto mb-4 h-12 w-12 text-base-content/40"
@@ -529,9 +507,7 @@ export const Products = () => {
                         d="M20 7l-8-4m0 0L4 7m16 0l-8 4m0 0l-8-4m0 0v10l8 4m0 0v-10m0 10l-8-4m0 0v10m16-10l-8 4m0 0v-10"
                       />
                     </svg>
-                    <h3 className="mt-2 text-lg font-medium text-base-content">
-                      No products found
-                    </h3>
+                    <h3 className="mt-2 text-lg font-medium text-base-content">No products found</h3>
                     <p className="mt-1 text-sm text-base-content/60">
                       {search || selectedCategory
                         ? 'Try adjusting your search or filter criteria'
@@ -540,7 +516,7 @@ export const Products = () => {
                     {hasActiveFilters && (
                       <button
                         onClick={handleClearFilters}
-                        className="mt-4 btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm mt-4 transition-all duration-200 hover:scale-105"
                       >
                         Clear Filters
                       </button>
@@ -552,17 +528,17 @@ export const Products = () => {
 
             {/* Pagination */}
             {!loading && totalPages > 1 && (
-              <div className="flex flex-col items-center justify-center gap-6 mt-8 py-8 border-t">
-                <div className="flex items-center gap-4 flex-wrap justify-center">
+              <div className="mt-8 flex flex-col items-center justify-center gap-6 border-t border-base-300 py-8">
+                <div className="flex flex-wrap items-center justify-center gap-4">
                   <button
-                    className="btn btn-outline"
+                    className="btn btn-outline transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
                     disabled={page === 1}
                     onClick={handlePrevPage}
                   >
                     ← Previous
                   </button>
 
-                  <div className="flex items-center gap-2 flex-wrap justify-center">
+                  <div className="flex flex-wrap items-center justify-center gap-2">
                     {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
                       let pageNum;
                       if (totalPages <= 5) {
@@ -578,7 +554,7 @@ export const Products = () => {
                       return (
                         <button
                           key={pageNum}
-                          className={`btn btn-sm ${
+                          className={`btn btn-sm transition-all duration-200 hover:scale-105 ${
                             page === pageNum ? 'btn-primary' : 'btn-outline'
                           }`}
                           onClick={() => {
@@ -593,7 +569,7 @@ export const Products = () => {
                   </div>
 
                   <button
-                    className="btn btn-outline"
+                    className="btn btn-outline transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
                     disabled={page === totalPages}
                     onClick={handleNextPage}
                   >

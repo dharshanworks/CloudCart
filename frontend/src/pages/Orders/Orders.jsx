@@ -56,15 +56,26 @@ export const Orders = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
+      {/* Scoped keyframes for staggered card load + subtle header reveal */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .v0-fade-up { animation: fadeUp 0.5s ease-out both; }
+      `}</style>
+
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-6">
         <Breadcrumb />
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold md:text-5xl">My Orders</h1>
+        {/* Header — gradient clipped-text title to match brand pages */}
+        <div className="v0-fade-up mb-8">
+          <h1 className="mb-2 bg-linear-to-r from-base-content via-base-content/80 to-base-content bg-clip-text text-4xl font-extrabold tracking-tight text-transparent md:text-5xl">
+            My Orders
+          </h1>
           <p className="text-base-content/70">
             View and track your orders
           </p>
@@ -75,7 +86,7 @@ export const Orders = () => {
           <div className="alert alert-error mb-6 shadow-lg">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6"
+              className="h-6 w-6 shrink-0 stroke-current"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -90,9 +101,9 @@ export const Orders = () => {
               <h3 className="font-bold">Error</h3>
               <div className="text-sm">{error}</div>
             </div>
-            <button 
+            <button
               onClick={fetchOrders}
-              className="btn btn-sm btn-ghost"
+              className="btn btn-sm btn-ghost transition-transform duration-200 hover:scale-105"
             >
               Retry
             </button>
@@ -103,7 +114,7 @@ export const Orders = () => {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="card animate-pulse bg-base-100 shadow">
+              <div key={i} className="card animate-pulse border border-base-300 bg-base-100 shadow">
                 <div className="card-body">
                   <div className="mb-3 h-6 w-1/4 rounded bg-base-300"></div>
                   <div className="mb-2 h-4 w-1/2 rounded bg-base-300"></div>
@@ -120,7 +131,7 @@ export const Orders = () => {
             action={
               <button
                 onClick={() => navigate('/products')}
-                className="btn btn-primary"
+                className="btn btn-primary transition-all duration-200 hover:scale-105"
               >
                 Browse Products
               </button>
@@ -128,11 +139,12 @@ export const Orders = () => {
           />
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
+            {orders.map((order, i) => (
               <div
                 key={order._id}
                 onClick={() => navigate(`/orders/${order._id}`)}
-                className="card cursor-pointer border border-base-300 bg-base-100 shadow transition hover:shadow-lg"
+                style={{ animationDelay: `${Math.min(i * 80, 480)}ms` }}
+                className="card v0-fade-up group cursor-pointer border border-base-300 bg-base-100 shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
               >
                 <div className="card-body">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -141,7 +153,7 @@ export const Orders = () => {
                         <h3 className="card-title text-lg md:text-xl">
                           Order #{order._id.slice(-8).toUpperCase()}
                         </h3>
-                        <span className={`badge ${getStatusBadgeColor(order.orderStatus)}`}>
+                        <span className={`badge ${getStatusBadgeColor(order.orderStatus)} transition-transform duration-200 group-hover:scale-105`}>
                           {getStatusIcon(order.orderStatus)} {order.orderStatus}
                         </span>
                       </div>
@@ -167,21 +179,21 @@ export const Orders = () => {
                       <p className="text-2xl font-bold text-primary md:text-3xl">
                         ${(order.totalPrice || 0).toFixed(2)}
                       </p>
-                      <button className="btn btn-sm btn-outline mt-3 w-full md:w-auto">
+                      <button className="btn btn-sm btn-outline mt-3 w-full transition-all duration-200 group-hover:btn-primary group-hover:scale-[1.02] md:w-auto">
                         View Details →
                       </button>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="mt-4 border-t pt-4">
+                  <div className="mt-4 border-t border-base-300 pt-4">
                     <div className="mb-2 flex justify-between text-xs text-base-content/60">
                       <span>Order Status</span>
-                      <span>{order.orderStatus}</span>
+                      <span className="capitalize">{order.orderStatus}</span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-base-200">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-base-200">
                       <div
-                        className={`h-2 rounded-full transition-all ${
+                        className={`h-2 rounded-full transition-all duration-500 ease-out ${
                           order.orderStatus === 'pending' ? 'w-1/4 bg-warning' :
                           order.orderStatus === 'processing' ? 'w-2/4 bg-info' :
                           order.orderStatus === 'shipped' ? 'w-3/4 bg-primary' :

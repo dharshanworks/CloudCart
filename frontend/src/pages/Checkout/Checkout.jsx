@@ -44,7 +44,9 @@ const FormSelect = ({ label, options, error, required = false, ...props }) => (
   </div>
 );
 
+
 export const Checkout = () => {
+  
   const navigate = useNavigate();
   const toast = useToast();
   const { cart, clearCart } = useContext(CartContext);
@@ -155,9 +157,13 @@ export const Checkout = () => {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="min-h-screen bg-transparent">
+      <div className="checkout-fade-up min-h-screen bg-transparent">
         <div className="container mx-auto px-4 py-8">
-          <div className="card border border-base-300 bg-base-100 shadow-lg">
+          <div
+            className="card group border border-base-300 bg-base-100 shadow-lg
+             transition-all duration-300
+             hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+          >
             <div className="card-body text-center">
               <h2 className="card-title justify-center text-2xl mb-4">Your cart is empty</h2>
               <p className="mb-6 text-base-content/70">
@@ -192,9 +198,8 @@ export const Checkout = () => {
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex-1">
                 <div
-                  className={`h-2 rounded-full transition-all ${
-                    s <= step ? 'bg-primary' : 'bg-base-300'
-                  }`}
+                  className={`h-2 rounded-full transition-all duration-500 ${s <= step ? 'bg-primary' : 'bg-base-300'
+                    }`}
                 ></div>
               </div>
             ))}
@@ -314,7 +319,8 @@ export const Checkout = () => {
                       <button
                         type="button"
                         onClick={handleNextStep}
-                        className="btn btn-primary flex-1"
+                        className="group btn btn-primary flex-1 transition-all duration-300
+           hover:-translate-y-0.5 hover:scale-105 hover:shadow-xl"
                       >
                         Next: Payment →
                       </button>
@@ -409,7 +415,8 @@ export const Checkout = () => {
                       <button
                         type="button"
                         onClick={handlePrevStep}
-                        className="btn btn-ghost flex-1"
+                        className="btn btn-ghost flex-1 transition-all duration-300
+           hover:-translate-y-0.5 hover:shadow-md"
                       >
                         ← Back
                       </button>
@@ -434,7 +441,11 @@ export const Checkout = () => {
             </form>
           </div>
 
-          <div className="card sticky top-24 h-fit border border-base-300 bg-base-100 shadow-lg">
+          <div
+            className="card group sticky top-24 h-fit border border-base-300 bg-base-100 shadow-lg
+             transition-all duration-300
+             hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+          >
             <div className="card-body">
               <h2 className="card-title text-2xl mb-6">Order Summary</h2>
 
@@ -482,25 +493,27 @@ export const Checkout = () => {
                   <span>${total.toFixed(2)}</span>
                 </div>
               </div>
-
-              <div className="alert alert-success mt-4 py-2">
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="stroke-current shrink-0 h-6 w-6"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-    />
-  </svg>
-  <div className="text-sm">
-    🔒 Secure checkout
-  </div>
-</div>
+              <div
+                className="alert alert-success mt-4 py-2 transition-all duration-300
+             hover:scale-[1.02]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div className="text-sm">
+                  🔒 Secure checkout
+                </div>
+              </div>
 
             </div>
           </div>

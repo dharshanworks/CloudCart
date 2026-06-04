@@ -68,19 +68,37 @@ export const Register = () => {
   const strengthScore = Object.values(passwordStrength).filter(Boolean).length;
 
   return (
-    <div className="flex min-h-screen items-center justify-center `bg-linear-to-br` from-gray-900 via-stone-800 to-gray-900 px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-br from-gray-900 via-stone-800 to-gray-900 bg-size-[200%_200%] px-4 py-8"
+         style={{ animation: 'heroPan 14s ease-in-out infinite' }}>
+      {/* Scoped keyframes: gentle background pan + soft fade/scale entrance for the card */}
+      <style>{`
+        @keyframes heroPan {
+          0%, 100% { background-position: 0% 50%; }
+          50%      { background-position: 100% 50%; }
+        }
+        @keyframes cardIn {
+          from { opacity: 0; transform: translateY(20px) scale(0.98); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .v0-card-in { animation: cardIn 0.6s ease-out both; }
+      `}</style>
+
+      <div className="v0-card-in w-full max-w-md">
+        {/* Brand header — badge gets a tactile hover lift */}
         <div className="mb-8 text-center">
-          <div className="mb-4 inline-block rounded-lg bg-white/20 p-3 backdrop-blur">
+          <div className="mb-4 inline-block rounded-2xl bg-white/15 p-3 shadow-lg ring-1 ring-white/20 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/25">
             <span className="text-4xl">🛒</span>
           </div>
-          <h1 className="mb-2 text-4xl font-bold text-white">CloudCart</h1>
+          <h1 className="mb-2 bg-linear-to-r from-white via-stone-200 to-white bg-clip-text text-4xl font-extrabold tracking-tight text-transparent">
+            CloudCart
+          </h1>
           <p className="text-white/80">Join our shopping community</p>
         </div>
 
-        <div className="card border border-white/10 bg-base-100 shadow-2xl">
+        {/* Card with subtle border glow and elevated shadow */}
+        <div className="card border border-white/10 bg-base-100 shadow-2xl transition-shadow duration-300 hover:shadow-primary/10">
           <div className="card-body space-y-6">
-            <h2 className="card-title text-2xl justify-center mb-2">Create Your Account</h2>
+            <h2 className="card-title mb-2 justify-center text-2xl">Create Your Account</h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name Field */}
@@ -92,7 +110,7 @@ export const Register = () => {
                   type="text"
                   name="name"
                   placeholder="John Doe"
-                  className={`input input-bordered w-full transition ${
+                  className={`input input-bordered w-full transition-all duration-200 focus:scale-[1.01] ${
                     errors.name ? 'input-error focus:input-error' : 'focus:input-primary'
                   }`}
                   value={formData.name}
@@ -115,7 +133,7 @@ export const Register = () => {
                   type="email"
                   name="email"
                   placeholder="you@example.com"
-                  className={`input input-bordered w-full transition ${
+                  className={`input input-bordered w-full transition-all duration-200 focus:scale-[1.01] ${
                     errors.email ? 'input-error focus:input-error' : 'focus:input-primary'
                   }`}
                   value={formData.email}
@@ -139,7 +157,7 @@ export const Register = () => {
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     placeholder="••••••••"
-                    className={`input input-bordered w-full transition pr-10 ${
+                    className={`input input-bordered w-full pr-10 transition-all duration-200 focus:scale-[1.01] ${
                       errors.password ? 'input-error focus:input-error' : 'focus:input-primary'
                     }`}
                     value={formData.password}
@@ -149,7 +167,7 @@ export const Register = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-base-content/70 hover:text-base-content/90"
+                    className="absolute right-3 top-3 text-base-content/70 transition-transform duration-200 hover:scale-110 hover:text-base-content/90"
                     tabIndex="-1"
                   >
                     {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -162,7 +180,7 @@ export const Register = () => {
                 )}
 
                 {/* Password Strength Indicator */}
-                    {formData.password && (
+                {formData.password && (
                   <div className="mt-2 rounded-lg bg-base-200 p-3">
                     <div className="mb-2 flex items-center gap-2">
                       <span className="text-xs font-semibold">Password Strength:</span>
@@ -170,7 +188,7 @@ export const Register = () => {
                         {[1, 2, 3, 4, 5].map((i) => (
                           <div
                             key={i}
-                            className={`h-1 flex-1 rounded-full transition ${
+                            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                               i <= strengthScore ? 'bg-success' : 'bg-base-300'
                             }`}
                           ></div>
@@ -178,16 +196,16 @@ export const Register = () => {
                       </div>
                     </div>
                     <ul className="space-y-1 text-xs">
-                      <li className={passwordStrength.hasLength ? 'text-success' : 'text-base-content/40'}>
+                      <li className={`transition-colors duration-200 ${passwordStrength.hasLength ? 'text-success' : 'text-base-content/40'}`}>
                         ✓ At least 8 characters
                       </li>
-                      <li className={passwordStrength.hasUpperCase ? 'text-success' : 'text-base-content/40'}>
+                      <li className={`transition-colors duration-200 ${passwordStrength.hasUpperCase ? 'text-success' : 'text-base-content/40'}`}>
                         ✓ Uppercase letter
                       </li>
-                      <li className={passwordStrength.hasLowerCase ? 'text-success' : 'text-base-content/40'}>
+                      <li className={`transition-colors duration-200 ${passwordStrength.hasLowerCase ? 'text-success' : 'text-base-content/40'}`}>
                         ✓ Lowercase letter
                       </li>
-                      <li className={passwordStrength.hasNumber ? 'text-success' : 'text-base-content/40'}>
+                      <li className={`transition-colors duration-200 ${passwordStrength.hasNumber ? 'text-success' : 'text-base-content/40'}`}>
                         ✓ Number
                       </li>
                     </ul>
@@ -205,7 +223,7 @@ export const Register = () => {
                     type={showConfirmPassword ? 'text' : 'password'}
                     name="confirmPassword"
                     placeholder="••••••••"
-                    className={`input input-bordered w-full transition pr-10 ${
+                    className={`input input-bordered w-full pr-10 transition-all duration-200 focus:scale-[1.01] ${
                       errors.confirmPassword ? 'input-error focus:input-error' : 'focus:input-primary'
                     }`}
                     value={formData.confirmPassword}
@@ -215,7 +233,7 @@ export const Register = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-3 text-base-content/70 hover:text-base-content/90"
+                    className="absolute right-3 top-3 text-base-content/70 transition-transform duration-200 hover:scale-110 hover:text-base-content/90"
                     tabIndex="-1"
                   >
                     {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
@@ -228,13 +246,11 @@ export const Register = () => {
                 )}
               </div>
 
-              
-
-              {/* Submit Button */}
+              {/* Submit Button — lift + scale + ring on hover */}
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary w-full btn-lg gap-2 mt-6"
+                className="btn btn-primary btn-lg mt-6 w-full gap-2 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl hover:ring-2 hover:ring-primary/30 disabled:hover:translate-y-0 disabled:hover:scale-100"
               >
                 {loading ? (
                   <>
@@ -253,7 +269,7 @@ export const Register = () => {
             {/* Login Link */}
             <p className="text-center text-sm text-base-content/70">
               Already have an account?{' '}
-              <Link to="/login" className="link link-primary font-semibold">
+              <Link to="/login" className="link link-primary font-semibold transition-colors hover:text-primary/80">
                 Log in here
               </Link>
             </p>

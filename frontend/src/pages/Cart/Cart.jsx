@@ -67,12 +67,12 @@ export const Cart = () => {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="space-y-4 lg:col-span-2">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="card animate-pulse bg-base-100 shadow">
+                <div key={i} className="card animate-pulse border border-base-300 bg-base-100 shadow">
                   <div className="card-body h-32"></div>
                 </div>
               ))}
             </div>
-            <div className="card animate-pulse bg-base-100 shadow">
+            <div className="card animate-pulse border border-base-300 bg-base-100 shadow">
               <div className="card-body h-64"></div>
             </div>
           </div>
@@ -88,7 +88,7 @@ export const Cart = () => {
           <div className="alert alert-error mb-6 shadow-lg">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6"
+              className="h-6 w-6 shrink-0 stroke-current"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -103,7 +103,10 @@ export const Cart = () => {
               <h3 className="font-bold">Error</h3>
               <div className="text-sm">{error}</div>
             </div>
-            <button onClick={fetchCart} className="btn btn-sm btn-ghost">
+            <button
+              onClick={fetchCart}
+              className="btn btn-sm btn-ghost transition-transform duration-200 hover:scale-105"
+            >
               Retry
             </button>
           </div>
@@ -127,7 +130,10 @@ export const Cart = () => {
             message="Looks like you haven't added any items yet. Start shopping to fill your cart!"
             icon="🛒"
             action={
-              <Link to="/products" className="btn btn-primary">
+              <Link
+                to="/products"
+                className="btn btn-primary transition-all duration-200 hover:scale-105"
+              >
                 Continue Shopping
               </Link>
             }
@@ -144,52 +150,94 @@ export const Cart = () => {
   const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const tax = subtotal * TAX_RATE;
   const total = subtotal + shippingCost + tax;
+  const freeShippingProgress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
 
   return (
     <div className="min-h-screen bg-transparent">
+      {/* Scoped keyframes for staggered item load */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .v0-fade-up { animation: fadeUp 0.5s ease-out both; }
+      `}</style>
+
       <div className="container mx-auto px-4 py-8">
-        <h1 className="mb-2 text-4xl font-bold md:text-5xl">Shopping Cart</h1>
+        {/* Header — gradient clipped-text title to match brand pages */}
+        <div className="v0-fade-up">
+          <h1 className="mb-2 bg-linear-to-r from-base-content via-base-content/80 to-base-content bg-clip-text text-4xl font-extrabold tracking-tight text-transparent md:text-5xl">
+            Shopping Cart
+          </h1>
           <p className="mb-8 text-base-content/70">
             {validCartItems.length} item{validCartItems.length !== 1 ? 's' : ''} in your cart
           </p>
+        </div>
 
-          {unavailableItemsCount > 0 && (
-            <div className="alert alert-warning mb-6">
-              <span>
-                {unavailableItemsCount} unavailable item
-                {unavailableItemsCount !== 1 ? 's were' : ' was'} hidden because the product no longer
-                exists.
-              </span>
-            </div>
-          )}
+        {unavailableItemsCount > 0 && (
+          <div className="alert alert-warning mb-6 shadow">
+            <span>
+              {unavailableItemsCount} unavailable item
+              {unavailableItemsCount !== 1 ? 's were' : ' was'} hidden because the product no longer
+              exists.
+            </span>
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            <div className="space-y-4 mb-6">
+            <div className="mb-6 space-y-4">
               {validCartItems.map((item, index) => (
-                <CartItem
+                <div
                   key={`${item.product._id}-${index}`}
-                  item={item}
-                  onUpdateQuantity={handleUpdateQuantity}
-                  onRemove={handleRemoveItem}
-                />
+                  className="v0-fade-up"
+                  style={{ animationDelay: `${Math.min(index * 70, 420)}ms` }}
+                >
+                  <CartItem
+                    item={item}
+                    onUpdateQuantity={handleUpdateQuantity}
+                    onRemove={handleRemoveItem}
+                  />
+                </div>
               ))}
             </div>
 
             {/* Clear Cart Button */}
-            <button onClick={handleClearCart} className="btn btn-outline btn-error w-full">
+            <button
+              onClick={handleClearCart}
+              className="btn btn-outline btn-error w-full transition-all duration-200 hover:scale-[1.01]"
+            >
               Clear Cart
             </button>
           </div>
 
           {/* Order Summary Sidebar */}
-          <div className="card sticky top-24 h-fit border border-base-300 bg-base-100 shadow-lg">
+          <div className="card v0-fade-up sticky top-24 h-fit border border-base-300 bg-base-100 shadow-lg transition-shadow duration-300 hover:shadow-xl">
             <div className="card-body">
-              <h2 className="card-title text-2xl mb-6">Order Summary</h2>
+              <h2 className="card-title mb-6 text-2xl">Order Summary</h2>
+
+              {/* Free Shipping Progress */}
+              {subtotal < FREE_SHIPPING_THRESHOLD ? (
+                <div className="mb-4 rounded-xl bg-base-200 p-3">
+                  <p className="mb-2 text-sm text-base-content/70">
+                    Add <span className="font-semibold text-primary">${(FREE_SHIPPING_THRESHOLD - subtotal).toFixed(2)}</span> more for free shipping!
+                  </p>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-base-300">
+                    <div
+                      className="h-2 rounded-full bg-primary transition-all duration-700 ease-out"
+                      style={{ width: `${freeShippingProgress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-4 rounded-xl bg-success/10 p-3 text-sm font-semibold text-success">
+                  🎉 You&apos;ve unlocked free shipping!
+                </div>
+              )}
 
               {/* Summary Items */}
-              <div className="space-y-3 border-b pb-4">
+              <div className="space-y-3 border-b border-base-300 pb-4">
                 <div className="flex justify-between">
                   <span className="text-base-content/70">Subtotal:</span>
                   <span className="font-semibold">${subtotal.toFixed(2)}</span>
@@ -201,11 +249,9 @@ export const Cart = () => {
                     <span className="font-semibold">${shippingCost.toFixed(2)}</span>
                   </div>
                 ) : (
-                  <div className="flex justify-between items-center">
+                  <div className="flex items-center justify-between">
                     <span className="text-base-content/70">Shipping:</span>
-                    <span className="flex items-center gap-1 font-semibold text-success">
-                      Free ✓
-                    </span>
+                    <span className="flex items-center gap-1 font-semibold text-success">Free ✓</span>
                   </div>
                 )}
 
@@ -215,41 +261,25 @@ export const Cart = () => {
                 </div>
               </div>
 
-              {/* Free Shipping Notice */}
-              {shippingCost > 0 && subtotal < FREE_SHIPPING_THRESHOLD && (
-                <div className="alert alert-info my-4 py-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    className="stroke-current shrink-0 w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                  <div className="text-sm">
-                    Add ${(FREE_SHIPPING_THRESHOLD - subtotal).toFixed(2)} more for free shipping!
-                  </div>
-                </div>
-              )}
-
               {/* Total */}
-              <div className="flex justify-between text-xl font-bold mt-6 mb-6">
+              <div className="mb-6 mt-6 flex justify-between text-xl font-bold">
                 <span>Total:</span>
                 <span className="text-primary">${total.toFixed(2)}</span>
               </div>
 
               {/* Checkout Button */}
-              <button onClick={handleCheckout} className="btn btn-primary w-full btn-lg mb-2">
+              <button
+                onClick={handleCheckout}
+                className="btn btn-primary btn-lg mb-2 w-full gap-2 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl hover:ring-2 hover:ring-primary/30"
+              >
                 Proceed to Checkout →
               </button>
 
               {/* Continue Shopping Button */}
-              <Link to="/products" className="btn btn-ghost w-full">
+              <Link
+                to="/products"
+                className="btn btn-ghost w-full transition-all duration-200 hover:scale-[1.01]"
+              >
                 Continue Shopping
               </Link>
 

@@ -46,19 +46,37 @@ export const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-gray-900 via-stone-800 to-gray-900 px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-br from-gray-900 via-stone-800 to-gray-900 bg-size-[200%_200%] px-4 py-8"
+         style={{ animation: 'heroPan 14s ease-in-out infinite' }}>
+      {/* Scoped keyframes: gentle background pan + a soft fade/scale entrance for the card */}
+      <style>{`
+        @keyframes heroPan {
+          0%, 100% { background-position: 0% 50%; }
+          50%      { background-position: 100% 50%; }
+        }
+        @keyframes cardIn {
+          from { opacity: 0; transform: translateY(20px) scale(0.98); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .v0-card-in { animation: cardIn 0.6s ease-out both; }
+      `}</style>
+
+      <div className="v0-card-in w-full max-w-md">
+        {/* Brand header — badge gets a tactile hover lift */}
         <div className="mb-8 text-center">
-          <div className="mb-4 inline-block rounded-lg bg-white/20 p-3 backdrop-blur">
+          <div className="mb-4 inline-block rounded-2xl bg-white/15 p-3 shadow-lg ring-1 ring-white/20 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/25">
             <span className="text-4xl">🛒</span>
           </div>
-          <h1 className="mb-2 text-4xl font-bold text-white">CloudCart</h1>
+          <h1 className="mb-2 bg-linear-to-r from-white via-stone-200 to-white bg-clip-text text-4xl font-extrabold tracking-tight text-transparent">
+            CloudCart
+          </h1>
           <p className="text-white/80">Welcome back to your shopping</p>
         </div>
 
-        <div className="card border border-white/10 bg-base-100 shadow-2xl">
+        {/* Card with subtle border glow and elevated shadow */}
+        <div className="card border border-white/10 bg-base-100 shadow-2xl transition-shadow duration-300 hover:shadow-primary/10">
           <div className="card-body space-y-6">
-            <h2 className="card-title text-2xl justify-center mb-2">Login to Your Account</h2>
+            <h2 className="card-title mb-2 justify-center text-2xl">Login to Your Account</h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Field */}
@@ -70,7 +88,7 @@ export const Login = () => {
                   type="email"
                   name="email"
                   placeholder="you@example.com"
-                  className={`input input-bordered w-full transition ${
+                  className={`input input-bordered w-full transition-all duration-200 focus:scale-[1.01] ${
                     errors.email ? 'input-error focus:input-error' : 'focus:input-primary'
                   }`}
                   value={formData.email}
@@ -94,7 +112,7 @@ export const Login = () => {
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     placeholder="••••••••"
-                    className={`input input-bordered w-full transition pr-10 ${
+                    className={`input input-bordered w-full pr-10 transition-all duration-200 focus:scale-[1.01] ${
                       errors.password ? 'input-error focus:input-error' : 'focus:input-primary'
                     }`}
                     value={formData.password}
@@ -104,7 +122,7 @@ export const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-base-content/70 hover:text-base-content/90"
+                    className="absolute right-3 top-3 text-base-content/70 transition-transform duration-200 hover:scale-110 hover:text-base-content/90"
                     tabIndex="-1"
                   >
                     {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -120,19 +138,16 @@ export const Login = () => {
               {/* Remember Me */}
               <div className="form-control">
                 <label className="label cursor-pointer justify-start gap-3">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-primary checkbox-sm"
-                  />
+                  <input type="checkbox" className="checkbox checkbox-primary checkbox-sm" />
                   <span className="label-text text-sm">Remember me</span>
                 </label>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button — lift + scale + ring on hover */}
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary w-full btn-lg gap-2 mt-6"
+                className="btn btn-primary btn-lg mt-6 w-full gap-2 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl hover:ring-2 hover:ring-primary/30 disabled:hover:translate-y-0 disabled:hover:scale-100"
               >
                 {loading ? (
                   <>
@@ -144,10 +159,11 @@ export const Login = () => {
                 )}
               </button>
             </form>
+
             {/* Sign Up Link */}
             <p className="text-center text-sm text-base-content/70">
               Don't have an account?{' '}
-              <Link to="/register" className="link link-primary font-semibold">
+              <Link to="/register" className="link link-primary font-semibold transition-colors hover:text-primary/80">
                 Sign up here
               </Link>
             </p>
